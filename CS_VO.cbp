@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="CS_VO" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/CS_VO" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="include" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/CS_VO" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="include/AIDispatcher.h" />
+		<Unit filename="include/BallisticDispatcher.h" />
+		<Unit filename="include/Bomb_t.h" />
+		<Unit filename="include/CharMap.h" />
+		<Unit filename="include/Ent_t.h" />
+		<Unit filename="include/Level.h" />
+		<Unit filename="include/MovementDispatcher.h" />
+		<Unit filename="include/Player_t.h" />
+		<Unit filename="include/Point_t.h" />
+		<Unit filename="include/Projectile_t.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="src/AIDispatcher.cpp" />
+		<Unit filename="src/BallisticDispatcher.cpp" />
+		<Unit filename="src/Bomb_t.cpp" />
+		<Unit filename="src/CharMap.cpp" />
+		<Unit filename="src/Ent_t.cpp" />
+		<Unit filename="src/Level.cpp" />
+		<Unit filename="src/MovementDispatcher.cpp" />
+		<Unit filename="src/Player_t.cpp" />
+		<Unit filename="src/Point_t.cpp" />
+		<Unit filename="src/Projectile_t.cpp" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
