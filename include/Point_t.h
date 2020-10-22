@@ -18,7 +18,7 @@ class Point_t
         char baseType;
         int x;
         int y;
-        int id;
+        //int id;
         std::vector<Ent_t*>entList;
         char renderPoint();
         void deleteEntFromPoint(Ent_t* e);

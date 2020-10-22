@@ -1,6 +1,8 @@
 #ifndef ENT_T_H
 #define ENT_T_H
 
+#include <ctime>
+#include <iostream>
 
 class Ent_t
 {
@@ -11,8 +13,8 @@ class Ent_t
         ~Ent_t();
         virtual char whatIam();
         void setCoordinates(int x,int y);
-        int idSystem;
-        int creationTime ; // should be of type time
+        //int idSystem;
+        time_t creationTime; // should be of type time
         void print();
 
     protected:

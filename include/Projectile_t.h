@@ -9,15 +9,12 @@
 class Projectile_t : public Ent_t
 {
     public:
-        Projectile_t(int x, int y);
+        Projectile_t(int x, int y, char direction, Ent_t* owner);
         int x;
         int y;
-        bool isHuman;
-        //bomb_t bomb = nullptr;
-        char lastDirection;
-        bool isAlive;
-        char Team;
-        void RIP(std::vector<Ent_t*>& p_entList);
+        char whatIam();
+        char direction;
+        Ent_t* owner;
         ~Projectile_t();
 
     protected:

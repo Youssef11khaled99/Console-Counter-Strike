@@ -7,6 +7,11 @@ Bomb_t::Bomb_t(int x, int y) : Ent_t(x, y)
     isDefused = false;
 }
 
+char Bomb_t::whatIam()
+{
+    return 'B';
+}
+
 
 Bomb_t::~Bomb_t()
 {
