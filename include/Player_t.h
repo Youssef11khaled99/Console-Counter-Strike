@@ -2,7 +2,7 @@
 #define PLAYER_T_H
 
 #include "Ent_t.h"
-#include "Bomb_t.h"
+//#include "Bomb_t.h"
 #include <utility>
 #include <vector>
 
@@ -15,7 +15,7 @@ class Player_t : public Ent_t
         int y;
         char whatIam();
         bool isHuman;
-        Bomb_t bomb;
+        //Bomb_t bomb;
         std::pair<int,int> lastDirection;
         bool isAlive;
         char team;

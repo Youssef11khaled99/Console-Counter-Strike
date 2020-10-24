@@ -1,6 +1,10 @@
 #include "Point_t.h"
 
-using namespace std;
+
+Point_t::Point_t()
+{
+
+}
 
 Point_t::Point_t(char characher, int x, int y)
 {
@@ -43,27 +47,27 @@ char Point_t::renderPoint()
     }
     else
     {
-        if (std::find(this->entList.begin(), this->entList.end(), '@') != this->entList.end())
+        if (find(this->entList.begin(), this->entList.end(), '@') != this->entList.end())
         {
             return '@';
         }
-        else if (std::find(this->entList.begin(), this->entList.end(), 'C') != this->entList.end())
+        else if (find(this->entList.begin(), this->entList.end(), 'C') != this->entList.end())
         {
             return 'C';
         }
-        else if (std::find(this->entList.begin(), this->entList.end(), 'CT') != this->entList.end())
+        else if (find(this->entList.begin(), this->entList.end(), 'CT') != this->entList.end())
         {
             return 'T';
         }
-        else if (std::find(this->entList.begin(), this->entList.end(), '*') != this->entList.end())
+        else if (find(this->entList.begin(), this->entList.end(), '*') != this->entList.end())
         {
             return '*';
         }
-        else if (std::find(this->entList.begin(), this->entList.end(), 'B') != this->entList.end())
+        else if (find(this->entList.begin(), this->entList.end(), 'B') != this->entList.end())
         {
             return 'B';
         }
-        else if (std::find(this->entList.begin(), this->entList.end(), 'P') != this->entList.end())
+        else if (find(this->entList.begin(), this->entList.end(), 'P') != this->entList.end())
         {
             return 'P';
         }
@@ -71,9 +75,9 @@ char Point_t::renderPoint()
     return this->baseType;
 }
 
-void Point_t::deleteEntFromPoint(Ent_t* entList)
+void Point_t::deleteEntFromPoint(Ent_t* e)
 {
-    std::vector<int>::iterator position = std::find(this->entList.begin(), this->entList.end(), 'P');
+    vector<int>::iterator position = find(this->entList.begin(), this->entList.end(), e->whatIam());
     if (position != this->entList.end())
     {
         this->entList.erase(position);

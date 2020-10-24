@@ -7,9 +7,12 @@
 #include "Ent_t.h"
 #include "Bomb_t.h"
 
+using namespace std;
+
 class Point_t
 {
     public:
+        Point_t();
         Point_t(char characher, int x, int y);
         bool isBombsite;
         bool isObstacle;
@@ -19,7 +22,7 @@ class Point_t
         int x;
         int y;
         //int id;
-        std::vector<Ent_t*>entList;
+        vector<Ent_t*>entList;
         char renderPoint();
         void deleteEntFromPoint(Ent_t* e);
         ~Point_t();
