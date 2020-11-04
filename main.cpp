@@ -784,7 +784,6 @@ void BallisticDispatcher::addProjectile(Projectile_t* proj)
 
 void BallisticDispatcher::updateAll()
 { 
-    printw("inside updateAll\n");
     for (int i = 0; i < projList.size(); i++)
     {
         char proDirec = projList[i]->direction;
@@ -820,7 +819,8 @@ void BallisticDispatcher::updateAll()
                 {
                     if (levelref->pointArray[currentX][currentY].entList[j]->whatIam() == '@' ||
                         levelref->pointArray[currentX][currentY].entList[j]->whatIam() == 'C' ||
-                        levelref->pointArray[currentX][currentY].entList[j]->whatIam() == 'T'
+                        levelref->pointArray[currentX][currentY].entList[j]->whatIam() == 'T' &&
+                        levelref->pointArray[currentX][currentY].entList[j] != projOwner
                         )
                     {
                         deleteProj(oldX, oldY, projList[i], i);
@@ -1141,7 +1141,6 @@ void BFS_Shortest_Path::ViewFinding(Level* lvl, Player_t* player, BallisticDispa
         2: ++currentY;//Right
         3: --currentY;//Left
     */
-    printw("Im in ViewFinding!!\n");
     for (int i = 0; i < 4; ++i)
     {
         int nx = x + dx[i];
@@ -1150,27 +1149,38 @@ void BFS_Shortest_Path::ViewFinding(Level* lvl, Player_t* player, BallisticDispa
         {
             for (int j = 0; j < lvl->pointArray[nx][ny].entList.size(); ++j)
             {
-                printw("entListSize: %d \n",lvl->pointArray[nx][ny].entList.size());
                 if (
                     ( lvl->pointArray[nx][ny].entList[j]->whatIam() == 'C' && player->team == 'T' )||
                     ( lvl->pointArray[nx][ny].entList[j]->whatIam() == 'T' && player->team == 'C' ) ||
                     ( lvl->pointArray[nx][ny].entList[j]->whatIam() == '@' && player->team != dynamic_cast<Player_t*>(lvl->pointArray[nx][ny].entList[j])->team)  
                     )
-                {
+                {   
                     printw("I find an enemy!!\n");
-                    if (i == 0)
+                    if 
+                    (
+                        i == 0 && player->lastDirection == 'd' ||
+                        i == 1 && player->lastDirection == 'u' ||
+                        i == 2 && player->lastDirection == 'r' ||
+                        i == 3 && player->lastDirection == 'l' 
+                    )   
+                    {
+                        printw("He is in my same direction!!\n");
+                        MovementDispatcher::makeMove(lvl, player,' ', ball);
+                        return;
+                    }
+                    else if (i == 0)
                     {
                         MovementDispatcher::makeMove(lvl, player,'d', ball);
                     }
-                    if (i == 1)
+                    else if (i == 1)
                     {
                         MovementDispatcher::makeMove(lvl, player,'u', ball);
                     }
-                    if (i == 2)
+                    else if (i == 2)
                     {
                         MovementDispatcher::makeMove(lvl, player,'r', ball);
                     }
-                    if (i == 3)
+                    else if (i == 3)
                     {
                         MovementDispatcher::makeMove(lvl, player,'l', ball);
                     }
@@ -1329,7 +1339,7 @@ void AIDispatcher::updateAll()
         if (botList[i]->isHuman == false)
         {
             printw("Bot Team: %c\n",botList[i]->team);
-            bfs.ViewFinding(levelref, botList[i], ballref);
+            
             if (botList[i]->team == 'T')
             {
                 if (botList[i]->isCarryingBomb() == false)
@@ -1390,6 +1400,7 @@ void AIDispatcher::updateAll()
             {
                 
             }
+            bfs.ViewFinding(levelref, botList[i], ballref);
         }
         
         // ViewFinding(); -- BFS
