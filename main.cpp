@@ -10,7 +10,7 @@
 //#include<windows.h>
 #include <unistd.h>
 #include <term.h>
-
+#include <bits/stdc++.h>
 
 
 using namespace std;
@@ -183,10 +183,22 @@ class MovementDispatcher
     public:
         MovementDispatcher();
         static char readkeyinput();
-        static void makeMove(Level* lvl, Player_t* p, char direction, BallisticDispatcher* ball);
+        static bool makeMove(Level* lvl, Player_t* p, char direction, BallisticDispatcher* ball);
         static void postMovemenetChecks(Level *lvl, Player_t *p);
 
         ~MovementDispatcher ();
+
+    protected:
+
+    private:
+};
+/******************************/
+class BFS_Shortest_Path {
+    public:
+        BFS_Shortest_Path ();
+        vector <pair<int,int>> BFS_Bomb_pSite(Level* lvl, Player_t* player, int objective);
+        void ViewFinding(Level* lvl, Player_t* player, BallisticDispatcher* ball);
+        ~BFS_Shortest_Path ();
 
     protected:
 
@@ -197,10 +209,13 @@ class AIDispatcher
 {
     public:
         AIDispatcher (Level* &map, BallisticDispatcher* &ballistics);
+        int counter;
+        vector<pair<int,int>> resVector;
         vector<Player_t*> botList;
         Player_t* human;
         Bomb_t* bomb;
         Level* levelref;
+        BFS_Shortest_Path bfs;
         BallisticDispatcher* ballref;
         void addHuman(Player_t* humanPlayer);
         void addBot(int x, int y, char team);
@@ -216,15 +231,7 @@ class AIDispatcher
     private:
 };
 /******************************/
-class Dijkstra_Shortest_Path {
-    public:
-        Dijkstra_Shortest_Path ();
-        ~Dijkstra_Shortest_Path ();
 
-    protected:
-
-    private:
-};
 /******************************/
 
 int main(int argc, char **argv)
@@ -261,8 +268,10 @@ int main(int argc, char **argv)
         //Super important to not mess up
         //parenthesis here else major fail.
         //This next line is the one we'd need to do asynchronous if we wanted to go that route
-        
-        MovementDispatcher::makeMove(dust2, player1, ch, ballistics);
+        if (player1->isAlive == true)
+        {
+            MovementDispatcher::makeMove(dust2, player1, ch, ballistics);
+        }
 
         //reads user input, we need
         //to also pass ballistic incase projectile is shot
@@ -417,8 +426,8 @@ Level::Level(CharMap *&originalMap)
     this->mapref = originalMap;
     this->roundTimer = 300;
     this->bombTimer = 30;
-    this->Talive = 5;
-    this->Calive = 5;
+    this->Talive = 1;
+    this->Calive = 1;
     this->bombPlanted = false;
     this->endCondition = 0;
     // dynamically create array of pointers of size height
@@ -481,7 +490,7 @@ void Level::clearScreen()
 Player_t* Level::openNteamSelect()
 {
     printw("Select team to play with { Terrorist (Attackers) || Counter Terrorist (Defenders) }\n");
-    printw("Enter 1 for 'T' Team OR 2 for 'C' Team OR 3 if you don't want to play\n");
+    printw("Enter A for 'T' Team OR B for 'C' Team OR I if you don't want to play\n");
     char selectedTeam;
     Player_t *player;
     
@@ -880,12 +889,13 @@ char MovementDispatcher::readkeyinput()
 
 }
 
-void MovementDispatcher::makeMove(Level* lvl, Player_t* p, char direction, BallisticDispatcher* ball)
+bool MovementDispatcher::makeMove(Level* lvl, Player_t* p, char direction, BallisticDispatcher* ball)
 {
     int currentX = p->x;
     int currentY = p->y;
     int oldX = p->x;
     int oldY = p->y;
+    bool status;
 
     printw("You make a %c Move\n", direction);
     if (direction == 'u') --currentX;//Up
@@ -897,12 +907,24 @@ void MovementDispatcher::makeMove(Level* lvl, Player_t* p, char direction, Balli
         // printw("Shooting Proj .....\n");
         Projectile_t *proj = new Projectile_t(currentX, currentY, p->lastDirection, p);
         ball->addProjectile(proj);
-        return;
+        return true;
     }
-    else if (direction == 'i') return; // idle
+    else if (direction == 'i') return true; // idle
 
+    
+    if (lvl->pointArray[currentX][currentY].baseType == ' ' || 
+        lvl->pointArray[currentX][currentY].baseType == 'T' || 
+        lvl->pointArray[currentX][currentY].baseType == 'C' ||
+        lvl->pointArray[currentX][currentY].baseType == 'P')
+    {
+        lvl->pointArray[oldX][oldY].deleteEntFromPoint(p);
+        // p->setCoordinates(currentX, currentY);
+        p->x = currentX;
+        p->y = currentY;
+        lvl->pointArray[currentX][currentY].entList.push_back(p);
+    }
     // Moving over BridgeTunnel
-    if (lvl->pointArray[currentX][currentY].isBridgeTunnel == true)
+    else if (lvl->pointArray[currentX][currentY].isBridgeTunnel == true)
     {
         if(
             ( p->lastDirection == 'u' && (direction == 'u' || direction == 'd')) ||
@@ -921,27 +943,18 @@ void MovementDispatcher::makeMove(Level* lvl, Player_t* p, char direction, Balli
         else 
         {
             printw("Can't move >>>\n");
-            return;
+            status =false;
         }
             
     }
-    else if (lvl->pointArray[currentX][currentY].baseType == ' ' || 
-        lvl->pointArray[currentX][currentY].baseType == 'T' || 
-        lvl->pointArray[currentX][currentY].baseType == 'C' ||
-        lvl->pointArray[currentX][currentY].baseType == 'P')
-    {
-        lvl->pointArray[oldX][oldY].deleteEntFromPoint(p);
-        // p->setCoordinates(currentX, currentY);
-        p->x = currentX;
-        p->y = currentY;
-        lvl->pointArray[currentX][currentY].entList.push_back(p);
-    }
     else {
         printw("Can't move >>>\n");
+        status =false;
     }
+    
     p->lastDirection = direction;
-
     postMovemenetChecks(lvl, p);
+    return status;
 }
 
 void MovementDispatcher::postMovemenetChecks(Level *lvl, Player_t *p)
@@ -989,8 +1002,8 @@ void MovementDispatcher::postMovemenetChecks(Level *lvl, Player_t *p)
         {
             if (lvl->pointArray[p->x][p->y].entList[i]->whatIam() == 'B')
             {
-                //Plant Bomb:
-                dynamic_cast<Bomb_t*>(p->bomb)->isDefused = true;
+                //Defused Bomb:
+                dynamic_cast<Bomb_t*>(lvl->pointArray[p->x][p->y].entList[i])->isDefused = true;
 
                 lvl->endCondition = 1;
 
@@ -1008,10 +1021,180 @@ MovementDispatcher ::~MovementDispatcher ()
     //dtor
 }
 /********************************************************************/
+BFS_Shortest_Path::BFS_Shortest_Path()
+{
+
+
+}
+
+vector <pair<int,int>> BFS_Shortest_Path::BFS_Bomb_pSite(Level* lvl, Player_t* player, int objective)
+{
+    /*
+        1: for BombSite
+        2: for Bomb
+    
+    */
+
+    //parent , x ,y
+    queue <pair<pair<int,int> ,pair<int,int> >> q;
+    pair <int,int> pos = {player->x,player->y};
+    q.push({ {-1,-1} , {pos.first,pos.second} } );
+    // x,y , parent
+    map<pair<int,int>,pair<int,int> > visited;
+    visited.insert({{pos.first,pos.second},{-1,-1}});
+    int dx[4] = {1,-1,0,0};
+    int dy[4] = {0,0,1,-1};
+    int destX;
+    int destY;
+    while(q.size()){
+        pair<pair<int,int> ,pair<int,int> > curr = q.front();
+        int x = curr.second.first;
+        int y = curr.second.second;
+        int px = curr.first.first;
+        int py = curr.first.second;
+        q.pop();
+        if (objective == 1 && lvl->pointArray[x][y].isBombsite == true)
+        {
+            destX = x;
+            destY = y;
+            break;
+        }
+        else if (objective == 2)
+        {
+            for (int i = 0; i < lvl->pointArray[x][y].entList.size(); i++)
+            {
+                if (lvl->pointArray[x][y].entList[i]->whatIam() == 'B')
+                {
+                    destX = x;
+                    destY = y;
+                    break;
+                }
+            }
+        }
+        
+        /*
+            0: ++currentX;//Down
+            1: --currentX;//Up
+            2: ++currentY;//Right
+            3: --currentY;//Left
+        */
+        for (int i = 0 ; i < 4 ;++i){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+            // printw("visited: %d\n", visited.count({nx, ny}));
+            if (visited.count({nx,ny}) ||
+                lvl->pointArray[nx][ny].isWall == true  ||
+                lvl->pointArray[nx][ny].isObstacle == true
+                )
+            {
+                continue;
+            }
+            // Moving over BridgeTunnel
+            if (lvl->pointArray[nx][ny].isBridgeTunnel == true)
+            {
+                if(
+                    ( player->lastDirection == 'u' && ( i == 0 || i == 1)) ||
+                    ( player->lastDirection == 'd' && (i == 0 || i == 1)) ||
+                    ( player->lastDirection == 'r' && (i == 2 || i == 3)) ||
+                    ( player->lastDirection == 'l' && (i == 2 || i == 3)) )
+                {
+                    // printw("I'm going to enter the bridge\n");
+                    // printw("x: %d || y: %d \n", nx,ny);
+                    visited.insert({{nx,ny},{x,y}});
+                    q.push({{x,y},{nx,ny}});
+                }
+                else
+                {
+                    printw("I can't move here");    
+                }
+                
+                    
+            }
+            else 
+            {
+                visited.insert({{nx,ny},{x,y}});
+                q.push({{x,y},{nx,ny}});
+            }
+            
+        }
+    }
+    printw("Im Here!!\n");
+    vector<pair<int,int> > v;
+    while (destX != -1){
+        v.push_back({destX,destY});
+        auto p = visited[{destX,destY}]; 
+        destX = p.first;
+        destY = p.second;
+    }
+    reverse(v.begin(),v.end());
+    return v;
+}
+void BFS_Shortest_Path::ViewFinding(Level* lvl, Player_t* player, BallisticDispatcher* ball)
+{
+    int dx[4] = {1,-1,0,0};
+    int dy[4] = {0,0,1,-1};
+    int x = player->x;
+    int y = player->y;
+    /*
+        0: ++currentX;//Down
+        1: --currentX;//Up
+        2: ++currentY;//Right
+        3: --currentY;//Left
+    */
+    printw("Im in ViewFinding!!\n");
+    for (int i = 0; i < 4; ++i)
+    {
+        int nx = x + dx[i];
+        int ny = y + dy[i];
+        while (lvl->pointArray[nx][ny].isWall != true)
+        {
+            for (int j = 0; j < lvl->pointArray[nx][ny].entList.size(); ++j)
+            {
+                printw("entListSize: %d \n",lvl->pointArray[nx][ny].entList.size());
+                if (
+                    ( lvl->pointArray[nx][ny].entList[j]->whatIam() == 'C' && player->team == 'T' )||
+                    ( lvl->pointArray[nx][ny].entList[j]->whatIam() == 'T' && player->team == 'C' ) ||
+                    ( lvl->pointArray[nx][ny].entList[j]->whatIam() == '@' && player->team != dynamic_cast<Player_t*>(lvl->pointArray[nx][ny].entList[j])->team)  
+                    )
+                {
+                    printw("I find an enemy!!\n");
+                    if (i == 0)
+                    {
+                        MovementDispatcher::makeMove(lvl, player,'d', ball);
+                    }
+                    if (i == 1)
+                    {
+                        MovementDispatcher::makeMove(lvl, player,'u', ball);
+                    }
+                    if (i == 2)
+                    {
+                        MovementDispatcher::makeMove(lvl, player,'r', ball);
+                    }
+                    if (i == 3)
+                    {
+                        MovementDispatcher::makeMove(lvl, player,'l', ball);
+                    }
+                    MovementDispatcher::makeMove(lvl, player,' ', ball);
+                    return;
+                }
+            }
+            nx += dx[i];
+            ny += dy[i];
+            
+        }
+        
+    }
+}
+BFS_Shortest_Path::~BFS_Shortest_Path()
+{
+
+}
+/********************************************************************/
 AIDispatcher::AIDispatcher(Level* &map, BallisticDispatcher* &ballistics)
 {
     levelref = map;
     ballref = ballistics;
+    counter = 0;
     // Adding all first team bots
     
     for (int i = 0; i < map->height; i++)
@@ -1039,8 +1222,18 @@ AIDispatcher::AIDispatcher(Level* &map, BallisticDispatcher* &ballistics)
             //     levelref->pointArray[i][j].entList.push_back(bomb);
 
             // }
-            
         }
+    }
+
+    for (int i = 0; i < botList.size(); i++)
+    {
+        if (botList[i]->team == 'T')
+        {
+            printw("Before BFS\n");
+            resVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
+        }
+        // ViewFinding(); -- BFS
+        // PathFinding(); -- BFS brdo
     }
 }
 
@@ -1085,12 +1278,15 @@ void AIDispatcher::addHuman(Player_t* humanPlayer)
 void AIDispatcher::addBot(int x, int y, char team)
 {
     Player_t* newBot;
-    for (int i = 0; i < 5; i++)
-    {
-        newBot = new Player_t(x, y, false, team);
-        botList.push_back(newBot);
-        levelref->pointArray[x][y].entList.push_back(newBot);
-    }
+    // for (int i = 0; i < 5; i++)
+    // {
+    //     newBot = new Player_t(x, y, false, team);
+    //     botList.push_back(newBot);
+    //     levelref->pointArray[x][y].entList.push_back(newBot);
+    // }
+    newBot = new Player_t(x, y, false, team);
+    botList.push_back(newBot);
+    levelref->pointArray[x][y].entList.push_back(newBot);
 }
 
 // Bomb_t* AIDispatcher::addBomb(int x, int y)
@@ -1111,6 +1307,7 @@ void AIDispatcher::checkForNewDead()
         {
             --levelref->Calive;
             printw("number of C alive: %d\n", levelref->Calive); 
+            botList[i] = NULL;
             botList.erase(botList.begin() + i);  
         }
         else if (botList[i]->isAlive == false && botList[i]->team == 'T')
@@ -1126,11 +1323,80 @@ void AIDispatcher::checkForNewDead()
 void AIDispatcher::updateAll()
 {
     checkForNewDead();
+    
     for (int i = 0; i < botList.size(); i++)
     {
-        // ViewFinding(); -- Dijkstra
-        // PathFinding(); -- Dijkstra brdo
+        if (botList[i]->isHuman == false)
+        {
+            printw("Bot Team: %c\n",botList[i]->team);
+            bfs.ViewFinding(levelref, botList[i], ballref);
+            if (botList[i]->team == 'T')
+            {
+                if (botList[i]->isCarryingBomb() == false)
+                {
+                    resVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 2);
+                }
+                else
+                {
+                    resVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
+                }
+                
+                // printw("Bot C: %d || %d\n",botList[i]->x,botList[i]->y);
+                // resVector = bfs.BFS_Bombsite(this->levelref, botList[i]);
+                char moveDirection;
+                if (counter != resVector.size() - 1)
+                {
+                    printw("SIzze: %d\n", resVector.size());
+                    printw("Counter: %d\n",counter);
+                    printw("resV currentX: %d || currentY: %d \n", resVector[counter].first, resVector[counter].second);
+                    printw("resV nextX: %d || nextY: %d \n",resVector[counter+1].first, resVector[counter+1].second);
+                    /*
+                        0: ++currentX;//Down
+                        1: --currentX;//Up
+                        2: ++currentY;//Right
+                        3: --currentY;//Left
+                    */
+                    if (resVector[counter].first - resVector[counter + 1].first > 0)
+                    {
+                        moveDirection = 'u';
+                        counter++;
+                        
+                    } 
+                    else if (resVector[counter].first - resVector[counter + 1].first < 0)
+                    {
+                        moveDirection = 'd';
+                        counter++;
+                    } 
+                    else if (resVector[counter].second - resVector[counter+ 1].second > 0)
+                    {
+                        moveDirection = 'l';
+                        counter++;
+                    } 
+                    else if (resVector[counter].second - resVector[counter+ 1].second < 0)
+                    {
+                        moveDirection = 'r';
+                        counter++;
+                    } 
+                    bool canMove = MovementDispatcher::makeMove(levelref, botList[i], moveDirection,ballref);
+                    if (!canMove)
+                    {
+                        counter = 0;
+                        resVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
+                    }
+                }
+                // printw("ENNNND\n");
+            }
+            else if (botList[i]->team == 'C')
+            {
+                
+            }
+        }
+        
+        // ViewFinding(); -- BFS
+        // PathFinding(); -- BFS brdo
     }
+    
+
 }
 
 AIDispatcher::~AIDispatcher()
