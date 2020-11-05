@@ -216,6 +216,7 @@ class AIDispatcher
     public:
         AIDispatcher (Level* &map, BallisticDispatcher* &ballistics);
         int *counter;
+        int delayCounter;
         vector< vector<pair<int,int>> > resVector;
         vector<Player_t*> botList;
         Player_t* human;
@@ -680,7 +681,7 @@ Point_t::Point_t(char character, int x, int y)
     isBridgeTunnel = false;
     if (character == 'P' || character == '1' || character == '2' || character == '3')
     {
-        this->baseType = 'P';
+        this->baseType = character;
         this->isBombsite = true;
     }
     else if (character == 'B')
@@ -751,7 +752,6 @@ void Point_t::deleteEntFromPoint(Ent_t* e)
     }
     e = NULL;
     delete e;
-    printw("Not Found\n");
 }
 
 Point_t::~Point_t()
@@ -825,7 +825,6 @@ void BallisticDispatcher::updateAll()
                 {
                     if (levelref->pointArray[currentX][currentY].entList[j]->whatIam() == '*')
                     {
-                        printw("Two bullets in the same spot\n");
                         levelref->pointArray[oldX][oldY].deleteEntFromPoint(projList[i]);
                         // levelref->pointArray[currentX][currentY].entList.push_back(projList[i]);
                         projList[i]->x = currentX;
@@ -930,6 +929,8 @@ bool MovementDispatcher::makeMove(Level* lvl, Player_t* p, char direction, Balli
     if (lvl->pointArray[currentX][currentY].baseType == ' ' || 
         lvl->pointArray[currentX][currentY].baseType == 'T' || 
         lvl->pointArray[currentX][currentY].baseType == 'C' ||
+        lvl->pointArray[currentX][currentY].baseType == '1' || 
+        lvl->pointArray[currentX][currentY].baseType == '2' || 
         lvl->pointArray[currentX][currentY].baseType == 'P')
     {
         lvl->pointArray[oldX][oldY].deleteEntFromPoint(p);
@@ -1063,6 +1064,7 @@ vector <pair<int,int>> BFS_Shortest_Path::BFS_Bomb_pSite(Level* lvl, Player_t* p
     int dy[4] = {0,0,1,-1};
     int destX;
     int destY;
+    int RNG = rand() % 2;
     while(q.size()){
         pair<pair<int,int> ,pair<int,int> > curr = q.front();
         int x = curr.second.first;
@@ -1070,11 +1072,22 @@ vector <pair<int,int>> BFS_Shortest_Path::BFS_Bomb_pSite(Level* lvl, Player_t* p
         int px = curr.first.first;
         int py = curr.first.second;
         q.pop();
-        if (objective == 1 && lvl->pointArray[x][y].isBombsite == true)
+        if (objective == 1)
         {
-            destX = x;
-            destY = y;
-            break;
+            if (RNG == 1 && lvl->pointArray[x][y].baseType == '1')
+            {
+                printw("Going to bombsite 1\n");
+                destX = x;
+                destY = y;
+                break;
+            }
+            else if (RNG == 0 && lvl->pointArray[x][y].baseType == '2')
+            {
+                printw("Skipping the first bombSite\n");
+                destX = x;
+                destY = y;
+                break;
+            }
         }
         else if (objective == 2)
         {
@@ -1178,7 +1191,6 @@ void BFS_Shortest_Path::ViewFinding(Level* lvl, Player_t* player, BallisticDispa
                     ( lvl->pointArray[nx][ny].entList[j]->whatIam() == '@' && player->team != dynamic_cast<Player_t*>(lvl->pointArray[nx][ny].entList[j])->team)  
                     )
                 {   
-                    printw("I find an enemy!!\n");
                     if 
                     (
                         i == 0 && player->lastDirection == 'd' ||
@@ -1187,9 +1199,8 @@ void BFS_Shortest_Path::ViewFinding(Level* lvl, Player_t* player, BallisticDispa
                         i == 3 && player->lastDirection == 'l' 
                     )   
                     {
-                        printw("He is in my same direction!!\n");
+                        printw("The enemy is in my same direction!!\n");
                         MovementDispatcher::makeMove(lvl, player,' ', ball);
-                        printw("Returning after Shooting!!\n");
                         return;
                     }
                     else if (i == 0)
@@ -1229,7 +1240,7 @@ AIDispatcher::AIDispatcher(Level* &map, BallisticDispatcher* &ballistics)
 {
     levelref = map;
     ballref = ballistics;
-    
+    human->isAlive == false;
     // Adding all first team bots
     
     for (int i = 0; i < map->height; i++)
@@ -1265,21 +1276,22 @@ AIDispatcher::AIDispatcher(Level* &map, BallisticDispatcher* &ballistics)
         counter[i] = 0;
         if (botList[i]->team == 'T')
         {
-            printw("Before BFS\n");
-            resVector.push_back(bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1));
+            vector<pair<int,int>> tmpVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
+            resVector.push_back(tmpVector);
         }
         else if (botList[i]->team == 'C')
         {
-
+            vector<pair<int,int>> tmpVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
+            resVector.push_back(tmpVector);
         }
         // ViewFinding(); -- BFS
         // PathFinding(); -- BFS brdo
     }
-}
+} 
 
 void AIDispatcher::addHuman(Player_t* humanPlayer)
 {
-    
+    human = humanPlayer;
     for (int i = 0; i < botList.size(); i++)
     {
         if (botList[i]->team == humanPlayer->team)
@@ -1375,7 +1387,7 @@ void AIDispatcher::checkForNewDead()
 void AIDispatcher::updateAll()
 {
     checkForNewDead();
-    
+    if (human-> isAlive == false) delayCounter--;
     for (int i = 0; i < botList.size(); i++)
     {
         if (botList[i]->isHuman == false)
@@ -1385,21 +1397,30 @@ void AIDispatcher::updateAll()
             if (botList[i]->team == 'T')
             {
                 printw("IsCarryingBomb: %d\n",botList[i]->isCarryingBomb());
+                int botObjective = 1;
+                
+                
                 // if the bomb in dropped
                 if (botList[i]->isCarryingBomb() == false && levelref->bombPlanted == false)
                 {
+                    botObjective = 2;
                     printw("Goo and carry the bomb\n");
-                    // if Human was in T team add 10 ticks delay 
-                    
-                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 2);
+                    // if (delayCounter == 0 || human->isAlive == false)
+                    // {
+                    //     resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], botObjective);
+                    // }
+                    // else 
+                    // {
+                    //     printw("10 Ticks delay for the Human Player to pick the bomb\n");
+                    // }
                     
                 } 
                 // If I carry the bomb
-                else if (botList[i]->isCarryingBomb() == true)
-                {
-                    printw("going to the bomb site\n");
-                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
-                }
+                // else if (botList[i]->isCarryingBomb() == true)
+                // {
+                //     printw("going to the bomb site\n");
+                //     resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
+                // }
                 // else if (bomb->isCarried == true && botList[i]->isCarryingBomb() == false)
                 // {
                 //     int RND = rand() % 2; 
@@ -1412,61 +1433,62 @@ void AIDispatcher::updateAll()
                 // {
                 //     resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
                 // }
-                else
-                {
-                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
-                }
+                // else
+                // {
+                //     resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
+                // }
                 
                 // printw("Bot C: %d || %d\n",botList[i]->x,botList[i]->y);
                 // resVector[i] = bfs.BFS_Bombsite(this->levelref, botList[i]);
-                char moveDirection;
-                if (counter[i] != resVector[i].size() - 1)
-                {
-                    printw("SIzze: %d\n", resVector[i].size());
-                    printw("Counter[i]: %d\n",counter[i]);
-                    printw("resV currentX: %d || currentY: %d \n", resVector[i][counter[i]].first, resVector[i][counter[i]].second);
-                    printw("resV nextX: %d || nextY: %d \n",resVector[i][counter[i]+1].first, resVector[i][counter[i]+1].second);
-                    /*
-                        0: ++currentX;//Down
-                        1: --currentX;//Up
-                        2: ++currentY;//Right
-                        3: --currentY;//Left
-                    */
-                    if (resVector[i][counter[i]].first - resVector[i][counter[i] + 1].first > 0)
-                    {
-                        moveDirection = 'u';
-                        counter[i]++;
-                        
-                    } 
-                    else if (resVector[i][counter[i]].first - resVector[i][counter[i] + 1].first < 0)
-                    {
-                        moveDirection = 'd';
-                        counter[i]++;
-                    } 
-                    else if (resVector[i][counter[i]].second - resVector[i][counter[i]+ 1].second > 0)
-                    {
-                        moveDirection = 'l';
-                        counter[i]++;
-                    } 
-                    else if (resVector[i][counter[i]].second - resVector[i][counter[i]+ 1].second < 0)
-                    {
-                        moveDirection = 'r';
-                        counter[i]++;
-                    } 
-                    bool canMove = MovementDispatcher::makeMove(levelref, botList[i], moveDirection,ballref);
-                    printw("current Counter: %d\n", counter[i]);
-                    if (!canMove)
-                    {
-                        printw("Cant move in update All\n");
-                        counter[i] = 0;
-                        resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
-                    }
-                }
+                
                 // printw("ENNNND\n");
             }
-            else if (botList[i]->team == 'C')
-            {
+            // else if (botList[i]->team == 'C')
+            // {
                 
+            // }
+            // AL MO4KALA HNA ==>
+
+            char moveDirection;
+            if (counter[i] != resVector[i].size() - 1)
+            {
+                // printw("SIzze: %d\n", resVector[i].size());
+                // printw("Counter[i]: %d\n",counter[i]);
+                /*
+                    0: ++currentX;//Down
+                    1: --currentX;//Up
+                    2: ++currentY;//Right
+                    3: --currentY;//Left
+                */
+                if (resVector[i][counter[i]].first - resVector[i][counter[i] + 1].first > 0)
+                {
+                    moveDirection = 'u';
+                    counter[i]++;
+                    
+                } 
+                else if (resVector[i][counter[i]].first - resVector[i][counter[i] + 1].first < 0)
+                {
+                    moveDirection = 'd';
+                    counter[i]++;
+                } 
+                else if (resVector[i][counter[i]].second - resVector[i][counter[i] + 1].second > 0)
+                {
+                    moveDirection = 'l';
+                    counter[i]++;
+                } 
+                else if (resVector[i][counter[i]].second - resVector[i][counter[i] + 1].second < 0)
+                {
+                    moveDirection = 'r';
+                    counter[i]++;
+                } 
+                bool canMove = MovementDispatcher::makeMove(levelref, botList[i], moveDirection,ballref);
+                printw("current Counter: %d\n", counter[i]);
+                if (!canMove)
+                {
+                    printw("Cant move in update All\n");
+                    counter[i] = 0;
+                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
+                }
             }
             bfs.ViewFinding(levelref, botList[i], ballref);
         }
