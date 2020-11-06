@@ -57,6 +57,7 @@ class Bomb_t : public Ent_t
         int x;
         int y;
         char whatIam();
+        void print();
         bool isPlanted;
         bool isCarried;
         bool isDefused;
@@ -216,6 +217,7 @@ class AIDispatcher
         AIDispatcher (Level* &map, BallisticDispatcher* &ballistics);
         int *counter;
         int delayCounter;
+        int *RNG;
         vector< vector<pair<int,int>> > resVector;
         vector<Player_t*> botList;
         Player_t* human;
@@ -410,6 +412,8 @@ Bomb_t::Bomb_t() : Ent_t(x,y)
 
 Bomb_t::Bomb_t(int x, int y) : Ent_t(x, y)
 {
+    this->x = x;
+    this->y = y;
     isPlanted = false;
     isCarried = false;
     isDefused = false;
@@ -418,6 +422,16 @@ Bomb_t::Bomb_t(int x, int y) : Ent_t(x, y)
 char Bomb_t::whatIam()
 {
     return 'B';
+}
+
+void Bomb_t::print()
+{
+    
+    printw("Bomb Details: \n");
+    printw("Location==> X: %d , Y: %d \n",this->x,this->y);
+    printw("isCarried: %d\n",this->isCarried);
+    printw("isPlanted: %d\n",this->isPlanted);
+    //printw("Creation time: \n",this->creationTime);
 }
 
 Bomb_t::~Bomb_t()
@@ -432,8 +446,8 @@ Level::Level(CharMap *&originalMap)
     this->mapref = originalMap;
     this->roundTimer = 300;
     this->bombTimer = 30;
-    this->Talive = 1;
-    this->Calive = 1;
+    this->Talive =5;
+    this->Calive =5;
     this->bombPlanted = false;
     this->endCondition = 0;
     // dynamically create array of pointers of size height
@@ -936,6 +950,11 @@ bool MovementDispatcher::makeMove(Level* lvl, Player_t* p, char direction, Balli
         // p->setCoordinates(currentX, currentY);
         p->x = currentX;
         p->y = currentY;
+        if (p->isCarryingBomb())
+        {
+            p->bomb->x = currentX;
+            p->bomb->y = currentY;
+        }
         lvl->pointArray[currentX][currentY].entList.push_back(p);
         status = true;
     }
@@ -1008,7 +1027,7 @@ void MovementDispatcher::postMovemenetChecks(Level *lvl, Player_t *p)
             lvl->bombPlanted = true;
             //Update Game that bomb
             //is planted so tick starts!
-            printw("Bomb Has Been Planted!");
+            printw("Bomb Has Been Planted!\n");
             getch();
             //Just to pause execution to see if it works
         }
@@ -1047,11 +1066,23 @@ BFS_Shortest_Path::BFS_Shortest_Path()
 vector <pair<int,int>> BFS_Shortest_Path::BFS_Bomb_pSite(Level* lvl, Player_t* player, int Target, int RNG)
 {
     /*
-        1: for BombSite
-        2: for Bomb
-        3: for Player who carry the bomb
+        1: Go for BombSite
+        2: Go for Bomb
+        3: Go for Player who carry the bomb
+        4: Go for Kills while bomb is planted
+        5: Go for defend the bomb after planting it
     */
-
+    //RNG [2- 20]
+    if (Target == 1 || Target == 4)
+    {
+        int RNGx = 2 + rand() % 20;
+        int RNGy = 2 + rand() % 20;
+    }
+    else if (Target == 5)
+    {
+        int RNGx = 2 + rand() % 10;
+        int RNGy = 2 + rand() % 10;
+    }
     //parent , x ,y
     queue <pair<pair<int,int> ,pair<int,int> >> q;
     pair <int,int> pos = {player->x,player->y};
@@ -1067,16 +1098,17 @@ vector <pair<int,int>> BFS_Shortest_Path::BFS_Bomb_pSite(Level* lvl, Player_t* p
         pair<pair<int,int> ,pair<int,int> > curr = q.front();
         int x = curr.second.first;
         int y = curr.second.second;
-        int px = curr.first.first;
-        int py = curr.first.second;
+        // int px = curr.first.first;
+        // int py = curr.first.second;
         q.pop();
         if (Target == 1)
         {
+            
             if (RNG == 1 && lvl->pointArray[x][y].baseType == '2')
             {
                 printw("Going to bombsite 1\n");
-                destX = x;
-                destY = y;
+                destX = x; 
+                destY = y; 
                 break;
             }
             else if (RNG == 0 && lvl->pointArray[x][y].baseType == '1')
@@ -1101,10 +1133,64 @@ vector <pair<int,int>> BFS_Shortest_Path::BFS_Bomb_pSite(Level* lvl, Player_t* p
         }
         else if (Target == 3)
         {
-            for (int i = 0; i < lvl->pointArray[x][y].entList.size(); i++)
+            getch();
+            clear();
+            
+            for (int i = 0; i < lvl->pointArray[x][y].entList.size(); ++i)
             {
-                if (lvl->pointArray[x][y].entList[i]->whatIam() == 'T' &&
-                    dynamic_cast<Player_t*>(lvl->pointArray[x][y].entList[i])->isCarryingBomb() == true)
+                printw("WhatIam: %c\n",lvl->pointArray[x][y].entList[i]->whatIam());
+                printw("Size: %d\n\n\n",lvl->pointArray[x][y].entList.size());
+                if (lvl->pointArray[x][y].entList[i]->whatIam() == '@')
+                {
+                    destX = x;
+                    destY = y;
+                    break;
+                }
+
+                // if (lvl->pointArray[x][y].entList[i]->whatIam() == '@')
+                // {
+                //     getch();
+                //     clear();
+                //     printw("Hello hUmna\n");
+                //     getch();
+                //     clear();
+                // }
+                // if (lvl->pointArray[x][y].entList[i]->whatIam() == 'T' ||
+                //     lvl->pointArray[x][y].entList[i]->whatIam() == '@'
+                // )
+                // {
+                //     // printw("We found a player %c\n", lvl->pointArray[x][y].entList[i]->whatIam());
+                //     // printw("is this player is carrying bomb: %d\n", dynamic_cast<Player_t*>(lvl->pointArray[x][y].entList[i])->isCarryingBomb() == true);
+                //     // if (dynamic_cast<Player_t*>(lvl->pointArray[x][y].entList[i])->isCarryingBomb() == true)
+                //     // {
+                //     //     printw("Found the play who carry the bomb!!\n");
+                //     //     destX = x;
+                //     //     destY = y;
+                //     //     break;
+
+                //     // }
+                // }
+            }
+            getch();
+            clear();
+        }
+        else if (Target == 4)
+        {
+            for (int i = 0; i < lvl->pointArray[x][y].entList.size(); ++i)
+            {
+                if (lvl->pointArray[x][y].entList[i]->whatIam() == 'B')
+                {
+                    destX = x;
+                    destY = y;
+                    break;
+                }
+            }
+        }
+        else if (Target == 5)
+        {
+            for (int i = 0; i < lvl->pointArray[x][y].entList.size(); ++i)
+            {
+                if (lvl->pointArray[x][y].entList[i]->whatIam() == 'B')
                 {
                     destX = x;
                     destY = y;
@@ -1218,7 +1304,6 @@ void BFS_Shortest_Path::ViewFinding(Level* lvl, Player_t* player, BallisticDispa
                         MovementDispatcher::makeMove(lvl, player,'l', ball);
                     }
                     //MovementDispatcher::makeMove(lvl, player,' ', ball);
-                    printw("Returning after changing direction!!\n");
                     return;
                 }
             }
@@ -1238,7 +1323,7 @@ AIDispatcher::AIDispatcher(Level* &map, BallisticDispatcher* &ballistics)
 {
     levelref = map;
     ballref = ballistics;
-    human->isAlive == false;
+    delayCounter = 10;
     // Adding all first team bots
     
     for (int i = 0; i < map->height; i++)
@@ -1260,29 +1345,33 @@ AIDispatcher::AIDispatcher(Level* &map, BallisticDispatcher* &ballistics)
                 clear();
                 printw("adding five bots to the T Team successfully\n");
             } 
-            // else if (levelref->pointArray[i][j].entList[k]->whatIam() == 'B') 
-            // {
-            //     this->bomb = addBomb(i, j);
-            //     levelref->pointArray[i][j].entList.push_back(bomb);
+            else
+            {
+                for (int k = 0; k < levelref->pointArray[i][j].entList.size(); k++)
+                {
 
-            // }
+                    if (levelref->pointArray[i][j].entList[k]->whatIam() == 'B')
+                    {
+                        bomb = dynamic_cast<Bomb_t*>(levelref->pointArray[i][j].entList[k]);
+                    }
+                }
+            }
         }
     }
     counter = new int [botList.size()];
+    RNG = new int [botList.size()];
     for (int i = 0; i < botList.size(); i++)
     {
         counter[i] = 0;
-        int RNG;
+        RNG[i] = rand() % 2;
         if (botList[i]->team == 'T')
         {
-            RNG = rand() % 2;
-            vector<pair<int,int>> tmpVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG);
+            vector<pair<int,int>> tmpVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG[i]);
             resVector.push_back(tmpVector);
         }
         else if (botList[i]->team == 'C')
         {
-            RNG = rand() % 2;
-            vector<pair<int,int>> tmpVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG);
+            vector<pair<int,int>> tmpVector = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG[i]);
             resVector.push_back(tmpVector);
         }
         // ViewFinding(); -- BFS
@@ -1333,7 +1422,7 @@ void AIDispatcher::addHuman(Player_t* humanPlayer)
 
                 botList.push_back(humanPlayer);
                 levelref->pointArray[i][j].entList.push_back(humanPlayer);
-            } 
+            }
         }
     }
 }
@@ -1341,15 +1430,15 @@ void AIDispatcher::addHuman(Player_t* humanPlayer)
 void AIDispatcher::addBot(int x, int y, char team)
 {
     Player_t* newBot;
-    // for (int i = 0; i < 5; i++)
-    // {
-    //     newBot = new Player_t(x, y, false, team);
-    //     botList.push_back(newBot);
-    //     levelref->pointArray[x][y].entList.push_back(newBot);
-    // }
-    newBot = new Player_t(x, y, false, team);
-    botList.push_back(newBot);
-    levelref->pointArray[x][y].entList.push_back(newBot);
+    for (int i = 0; i < 5; i++)
+    {
+        newBot = new Player_t(x, y, false, team);
+        botList.push_back(newBot);
+        levelref->pointArray[x][y].entList.push_back(newBot);
+    }
+    // newBot = new Player_t(x, y, false, team);
+    // botList.push_back(newBot);
+    // levelref->pointArray[x][y].entList.push_back(newBot);
 }
 
 // Bomb_t* AIDispatcher::addBomb(int x, int y)
@@ -1388,87 +1477,110 @@ void AIDispatcher::checkForNewDead()
 void AIDispatcher::updateAll()
 {
     checkForNewDead();
-    printw("Human Status: %d\n",human->isAlive);
-    if (human-> isAlive == false) delayCounter--;
+    printw("Human Status: %d\n",human->isHuman);
+    // if (human-> isAlive == false)
+    // {
+    //     delayCounter = 0;
+    // } 
+    
     for (int i = 0; i < botList.size(); i++)
     {
+        if (botList[i]->isCarryingBomb() == true)
+        {
+            printw("HERE\n");
+            bomb = botList[i]->bomb;
+            bomb->print();
+        }
         if (botList[i]->isHuman == false)
         {
             // printw("Bot Team: %c\n",botList[i]->team);
             
+            // bomb->print();
             if (botList[i]->team == 'T')
             {
-                printw("IsCarryingBomb: %d\n",botList[i]->isCarryingBomb());
-                int botTarget = 1;
                 
+                int botTarget = 1;
                 // resVector[i] = bfs.BFS_Bomb_pSite(levelref, botList[i], 1, 1);
                 // if the bomb in dropped
-                if (botList[i]->isCarryingBomb() == false && levelref->bombPlanted == false)
-                {
-                    getch();
-                    clear();
-                    printw("Size before %d\n", resVector[i].size());
-                    resVector[i] = bfs.BFS_Bomb_pSite(levelref, botList[i], 2, 1);
-                    printw("Size After %d\n", resVector[i].size());
-                    getch();
-                    clear();
-
-
-                    // if (delayCounter == 0 || human->isAlive == false)
+                // if (bomb->isCarried == false && botList[i]->isCarryingBomb() == false && levelref->bombPlanted == false)
+                // {
+                //     printw("I should pick the bomb\n");
+                //     resVector[i] = bfs.BFS_Bomb_pSite(levelref, botList[i], 2, 1);
+                //     counter[i] = 0;
+                    // if (delayCounter == 0 || human->isAlive == false || human->isHuman == false)
                     // {
-                    //     resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], botObjective);
+                    //     printw("I should pick the bomb\n");
+                    //     resVector[i] = bfs.BFS_Bomb_pSite(levelref, botList[i], 2, 1);
+                    //     counter[i] = 0;
+                    //     delayCounter = 10;
                     // }
                     // else 
                     // {
-                    //     printw("10 Ticks delay for the Human Player to pick the bomb\n");
+                    //     resVector[i] = bfs.BFS_Bomb_pSite(levelref, botList[i], 1, RNG[i]);
+                    //     counter[i] = 0;
+                    //     delayCounter--;
                     // }
                     
-                } 
-                else {
-                    printw("Im in else!!\n");
-
-                    resVector[i] = bfs.BFS_Bomb_pSite(levelref, botList[i], 1, 1);
-                    counter[i] = 0;
-                }
+                // } 
                 // If I carry the bomb
-                // else if (botList[i]->isCarryingBomb() == true)
+                if (botList[i]->isCarryingBomb() == true)
+                {
+                    printw("going to the bomb site\n");
+                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG[i]);
+                }
+                // If bomb is carried by other teammate
+                // else if (bomb->isCarried == true && botList[i]->isCarryingBomb() == false && bomb->isPlanted == false)
                 // {
-                //     printw("going to the bomb site\n");
-                //     resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
-                // }
-                // else if (bomb->isCarried == true && botList[i]->isCarryingBomb() == false)
-                // {
-                //     int RND = rand() % 2; 
-                //     if (RND == 1)
-                //         resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 3);
+                //     printw("If bomb is carried by other teammate\n");
+                //     printw("RNG[i]: %d\n",RNG[i]);
+                //     if (RNG[i] == 1)
+                //     {
+                //         printw("Follow Your teammate\n");
+                //         resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 3, RNG[i]);
+                //     }
                 //     else 
-                //         resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
+                //     {
+                //         resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG[i]);
+                //     }
                 // }
-                // else if (bomb->isPlanted == true)
-                // {
-                //     resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
-                // }
-                // else
-                // {
-                //     resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1);
-                // }
+                // Go and defend the bomb
+                else if (levelref->bombPlanted == true)
+                {
+                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 5, 1);
+                }
+                else
+                {
+                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG[i]);
+                }
+                counter[i] = 0;
                 
-                // printw("Bot C: %d || %d\n",botList[i]->x,botList[i]->y);
-                // resVector[i] = bfs.BFS_Bombsite(this->levelref, botList[i]);
-                
-                // printw("ENNNND\n");
             }
-            // else if (botList[i]->team == 'C')
-            // {
-                
-            // }
-            // AL MO4KALA HNA ==>
+            else if (botList[i]->team == 'C')
+            {
+                if (levelref->bombPlanted == false)
+                {
+                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG[i]);
+                }
+                else if (levelref->bombPlanted == true)
+                {
+                    if (RNG[i] == 1)
+                    {
+                        printw("Bomb Status: %d\n", bomb->isPlanted);
+                        resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 2, 1);
+                    }
+                    else 
+                    {
+                        // Go for Kills in range [2 - 20]
+                        resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 4, 1);
+                    }
+                }
+                // if one of my team sees an enemy we go to him
+                counter[i] = 0;
+            }
 
             char moveDirection;
             if (counter[i] != resVector[i].size() - 1)
             {
-                // printw("SIzze: %d\n", resVector[i].size());
-                // printw("Counter[i]: %d\n",counter[i]);
                 /*
                     0: ++currentX;//Down
                     1: --currentX;//Up
@@ -1501,19 +1613,13 @@ void AIDispatcher::updateAll()
                 if (!canMove)
                 {
                     printw("Cant move in update All\n");
+                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG[i]);
                     counter[i] = 0;
-                    int RNG = 1;
-                    resVector[i] = bfs.BFS_Bomb_pSite(this->levelref, botList[i], 1, RNG);
                 }
             }
             bfs.ViewFinding(levelref, botList[i], ballref);
         }
-        
-        // ViewFinding(); -- BFS
-        // PathFinding(); -- BFS brdo
     }
-    
-
 }
 
 AIDispatcher::~AIDispatcher()
