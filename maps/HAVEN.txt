@@ -1,0 +1,49 @@
+HAVEN    46 x 90
+nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx    C     xxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx          xxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx          xxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                         xxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx       xxxxxxxxx         xxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxx                   xxxxxxxxx                         xxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxx                   xxxxxxxxx                         xxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxx    xx   xxxxxxxn
+nxxxxxxxxxxxxxxxxx              xxxxxxxxxxx     xxxxxxxxxxxxxxx   xxxxxxx    xx   xxxxxxxn
+nxxxxxxxxxxxxxxxxx              xxxxxxxxxxx xxx xxxxxxxxxxxxxxx              xx       xxxn
+npppppppppppppp      xxxxxx     xxxxxxxxx          xxxxxxxxxxxx   xxxxxxx    xx       xxxn
+npppppppppppppp      xxxxxx     xxxxxxx             xxxxxxxxxxx   xxxxxxx    pppppppppppxn
+npppppppppppppp      xxxxxx                           xxxxxxxxx   xxx        pppppppppppxn
+nppppppxxxxxxxx      xxxxxx              pppppppppp   x           xxx        ppxxxxxxpppxn
+npppppppppppxxx      xxxxxxx   xxxxxxx   pxxxxxxxxp               xxx      xxxxxxxxxxpppxn
+npppppppppppxxx      xxxxxx         xx   pppxxxxppp   x          xxxx      xxxxxxpppppppxn
+nxx                xxxxxxxx         xx   pppppppppp   xxxxxxx    xxxx        pppppppppppxn
+nxx                xxxxxxxxxxx   xxxxx                xxxxxxxxxxxxxxx                   xn
+nxx                                 xx                x           xxxxxx       xxx      xn
+nxx                                 xxxxxxx   xxxxxxxxx                        xxx    xxxn
+nxx         xx      xxxxxxxx      xxxx          xxxxxxx                  x       x    xxxn
+nxxxxxx    xxxxxxxxxxxxxxxxx        xx          xxxxxxxxx  xxxxxxxxxxxxxxx       x    xxxn
+nxxxxxx    xxxxxxxxxxxxxxxxxxxxx xxxxxxxxx      xxxxxxxxx  xxxxxxxxxxxxxxxxxxxxxxx      xn
+nxxxxxx    xxxxxxxxxxxxxxxxx        xxxxxx    xxxxxxxxxxx  xxxxxxxxxxxxxxxxxxx          xn
+nxxxxxx    xxxxxxxxxxxxxxxxx        xxxxxx    xxxxxxxxxxx  xxxx   xxxxxxx               xn
+nxxxxxxx       xxxxxxxxxxxxx                        xx       xx   xx             xx     xn
+nxxxxxxx       xxxxxxxxxxxxx                        xxxx                         xxxxxxxxn
+nxxxxxxx       xxxxxxxxxxxxx                        xxxx                      xxxxxxxxxxxn
+nxxxxxxx   xxxxxxxxxxxxxxxxx                        xx       xx          xxxxxxxxxxxxxxxxn
+nxxxx      xxxxxxxxxxxxxxxxx        xxxxxxx    xxxxxxx       xx     xxxxxxxxxxxxxxxxxxxxxn
+nxxxx           xx       xxx          x             xxxxx  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxx                    xxx          xxxxxxxxxxxx  xx       xxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxx           xx       xxxxxxx      xxxxxxxxxxxx           xxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxx           xx       xxxxxxx          xxxxxx             xxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxx                                           xxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxx                   xxxxxxxxxxx                xxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  xxxxxxxxxxx  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  xxxxxxxxxxx  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  xxxxxxxxxxx  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx         B          xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx         T            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxn
+nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+
+Made by: Godlander
