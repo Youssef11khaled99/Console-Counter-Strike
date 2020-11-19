@@ -1057,7 +1057,7 @@ MovementDispatcher ::MovementDispatcher ()
 
 char MovementDispatcher::readkeyinput()
 {
-    char moveChar = getch();
+    chtype moveChar = getch();
     if (moveChar == 'q' || moveChar == 'Q') return 'q';
     if (moveChar == 'W' || moveChar == 'w' || moveChar == KEY_UP) return 'u';
     if (moveChar == 'S' || moveChar == 's' || moveChar == KEY_DOWN) return 'd';
