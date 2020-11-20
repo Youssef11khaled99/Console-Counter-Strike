@@ -1,5 +1,4 @@
 # CS_VO
-# Wssel_Task
 
 ### To use this project you will need the following requirments
 
