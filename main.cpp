@@ -637,7 +637,7 @@ Player_t* Level::openNteamSelect()
         }
     }    
     // this->renderLevel();
-    return player; // I don't know yet what I should return
+    return player; 
 }
 
 pair<int, int> Level::mapSearch()
@@ -741,7 +741,6 @@ void Player_t::RIP(vector<Ent_t*>& p_entList, Ent_t* owner)
         {
             printw("RIIIIP\n");
             dynamic_cast<Player_t*>(p_entList[i])->isAlive = false;
-            p_entList.erase(p_entList.begin() + i);
             if (dynamic_cast<Player_t*>(p_entList[i])->isCarryingBomb())
             {
                 dynamic_cast<Player_t*>(p_entList[i])->haveBomb = false;
@@ -752,6 +751,7 @@ void Player_t::RIP(vector<Ent_t*>& p_entList, Ent_t* owner)
 
                 p_entList.push_back(dynamic_cast<Player_t*>(p_entList[i])->bomb);
             }
+            p_entList.erase(p_entList.begin() + i);
             i--;
         }
     }
@@ -933,39 +933,18 @@ void BallisticDispatcher::updateAll()
         int oldY = projList[i]->y;
         Player_t* projOwner = dynamic_cast<Player_t*>(projList[i]->owner);
         // if there is an enemy in my same point
-        // for (int j = 0; j < levelref->pointArray[oldX][oldY].entList.size(); j++)
-        // {
-        //     if ( dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->team != projOwner->team)
-        //     {
-        //         printw("Shooting an enemy . . . \n");
-        //         deleteProj(oldX, oldY, projList[i], i);
-        //         i--;
-        //         Player_t* deadPlayer = dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j]);
-        //         getch();
-        //         clear();
-        //         printw("Printing deadPlayer Details: \n");
-        //         printw("isHuman: %d \n", deadPlayer->isHuman);
-        //         printw("isAlive: %d \n", deadPlayer->isAlive);
-        //         printw("team: %c \n", deadPlayer->team);
-        //         printw("isCarrying Bomb: %d \n", deadPlayer->isCarryingBomb());
-                
-        //         getch();
-        //         clear();
-        //         dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->isAlive = false;
-        //         levelref->pointArray[oldX][oldY].entList.erase(levelref->pointArray[oldX][oldY].entList.begin() + j);
-        //         if (dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->isCarryingBomb())
-        //         {
-        //             dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->haveBomb = false;
-        //             // Bomb_t *bomb = new Bomb_t(x, y);
-        //             dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->bomb->isCarried = false;
-        //             dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->bomb->x = dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->x;
-        //             dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->bomb->y = dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->y;
+        if ( levelref->pointArray[oldX][oldX].entList.size() > 1 )
+        {
+            for (int j = 0; j < levelref->pointArray[oldX][oldX].entList.size(); j++)
+            {
+                if (dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldX].entList[j])->team !=
+                projOwner->team)
+                {
+                    printw("ENEMY IN THE SAME SPOT!!\n");
+                }
+            }
 
-        //             levelref->pointArray[oldX][oldY].entList.push_back(dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldY].entList[j])->bomb);
-        //         }
-        //         j--;
-        //     }
-        // }
+        }
 
         if (proDirec == 'u') --currentX;//Up
         else if (proDirec == 'd') ++currentX;//Down
@@ -1032,6 +1011,7 @@ void BallisticDispatcher::updateAll()
                 
             }
         }
+        
         // printw("End of UpdateALL . . . \n");
     }
 }
@@ -1415,11 +1395,7 @@ pair<int, int> BFS_Shortest_Path::ViewFinding(Level* lvl, Player_t* player, Ball
         {
             for (int j = 0; j < lvl->pointArray[nx][ny].entList.size(); ++j)
             {
-                if (
-                    ( lvl->pointArray[nx][ny].entList[j]->whatIam() == 'C' && player->team == 'T' )||
-                    ( lvl->pointArray[nx][ny].entList[j]->whatIam() == 'T' && player->team == 'C' ) ||
-                    ( lvl->pointArray[nx][ny].entList[j]->whatIam() == '@' && player->team != dynamic_cast<Player_t*>(lvl->pointArray[nx][ny].entList[j])->team)  
-                    )
+                if (player->team != dynamic_cast<Player_t*>(lvl->pointArray[nx][ny].entList[j])->team)  
                 {  
                     
                     player->enemyLastLocation.first = nx;
@@ -1464,12 +1440,7 @@ pair<int, int> BFS_Shortest_Path::ViewFinding(Level* lvl, Player_t* player, Ball
             ny += dy[i];
             
         }
-        //return player->enemyLastLocation;
-        
     }
-    // pair<int, int> noEnemy;
-    // noEnemy.first = 0;
-    // noEnemy.second = 0;
     return player->enemyLastLocation;
 }
 BFS_Shortest_Path::~BFS_Shortest_Path()
@@ -1644,12 +1615,12 @@ void AIDispatcher::updateAll()
     for (int i = 0; i < botList.size(); i++)
     {
         // printw("Is carrying bomb: %d\n", botList[i]->isCarryingBomb());
-        if (botList[i]->isCarryingBomb() == true)
-        {
-            // printw("HERE\n");
-            bomb = botList[i]->bomb;
-            bomb->print();
-        }
+        // if (botList[i]->isCarryingBomb() == true)
+        // {
+        //     // printw("HERE\n");
+        //     bomb = botList[i]->bomb;
+        //     bomb->print();
+        // }
         if (botList[i]->isHuman == false)
         {
             
