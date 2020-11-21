@@ -1,11 +1,11 @@
 # CS_VO
 
-### To use this project you will need the following requirments
+### To use this project you will need the following requirements
 
 ---
 ## Requirements
 
-For development, you will only need g++ and a ncurses package in your environement.
+For development, you will only need g++ and a ncurses package in your environment.
 
 ### g++
 - #### g++ installation on Windows
