@@ -932,19 +932,19 @@ void BallisticDispatcher::updateAll()
         int oldX = projList[i]->x;
         int oldY = projList[i]->y;
         Player_t* projOwner = dynamic_cast<Player_t*>(projList[i]->owner);
-        // if there is an enemy in my same point
-        if ( levelref->pointArray[oldX][oldX].entList.size() > 1 )
-        {
-            for (int j = 0; j < levelref->pointArray[oldX][oldX].entList.size(); j++)
-            {
-                if (dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldX].entList[j])->team !=
-                projOwner->team)
-                {
-                    printw("ENEMY IN THE SAME SPOT!!\n");
-                }
-            }
+        // if there is an enemy in my if ( levelref->pointArray[oldX][oldX].entList.size() > 1 )
+        // {
+        //     for (int j = 0; j < levelref->pointArray[oldX][oldX].entList.size(); j++)
+        //     {
+        //         if (dynamic_cast<Player_t*>(levelref->pointArray[oldX][oldX].entList[j])->team !=
+        //         projOwner->team)
+        //         {
+        //             printw("ENEMY IN THE SAME SPOT!!\n");
+        //         }
+        //     }
 
-        }
+        // }same point
+        // 
 
         if (proDirec == 'u') --currentX;//Up
         else if (proDirec == 'd') ++currentX;//Down
@@ -1395,7 +1395,11 @@ pair<int, int> BFS_Shortest_Path::ViewFinding(Level* lvl, Player_t* player, Ball
         {
             for (int j = 0; j < lvl->pointArray[nx][ny].entList.size(); ++j)
             {
-                if (player->team != dynamic_cast<Player_t*>(lvl->pointArray[nx][ny].entList[j])->team)  
+                if (
+                    ( lvl->pointArray[nx][ny].entList[j]->whatIam() == 'C' && player->team == 'T' )||
+                    ( lvl->pointArray[nx][ny].entList[j]->whatIam() == 'T' && player->team == 'C' ) ||
+                    ( lvl->pointArray[nx][ny].entList[j]->whatIam() == '@' && player->team != dynamic_cast<Player_t*>(lvl->pointArray[nx][ny].entList[j])->team)  
+                    )
                 {  
                     
                     player->enemyLastLocation.first = nx;
