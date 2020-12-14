@@ -932,7 +932,8 @@ void BallisticDispatcher::updateAll()
         int oldX = projList[i]->x;
         int oldY = projList[i]->y;
         Player_t* projOwner = dynamic_cast<Player_t*>(projList[i]->owner);
-        // if there is an enemy in my if ( levelref->pointArray[oldX][oldX].entList.size() > 1 )
+        // if there is an enemy in my point
+        // if ( levelref->pointArray[oldX][oldX].entList.size() > 1 )
         // {
         //     for (int j = 0; j < levelref->pointArray[oldX][oldX].entList.size(); j++)
         //     {
@@ -943,8 +944,7 @@ void BallisticDispatcher::updateAll()
         //         }
         //     }
 
-        // }same point
-        // 
+        // }
 
         if (proDirec == 'u') --currentX;//Up
         else if (proDirec == 'd') ++currentX;//Down
