@@ -9,6 +9,8 @@ This is a console-based Counter-Strike game implemented in C++. It offers a retr
 - **Score Tracking**: Keep track of your performance with an integrated scoring system.
 - **Simple and Lightweight**: No external libraries required, pure C++!
 
+# Please check overview.pdf to get better understanding of the game and how it works 
+
 ## Installation
 
 For development, you will only need g++ and a ncurses package in your environment.
