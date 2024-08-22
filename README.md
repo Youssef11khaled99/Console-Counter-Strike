@@ -1,9 +1,15 @@
-# CS_VO
+# Console Counter-Strike Game
 
-### To use this project you will need the following requirements
+## Overview
+This is a console-based Counter-Strike game implemented in C++. It offers a retro, text-based FPS experience, bringing the excitement of classic Counter-Strike gameplay to your terminal.
 
----
-## Requirements
+## Features
+- **First-Person Shooter Mechanics**: Shoot, reload, and take down enemies.
+- **Enemy AI**: Basic enemy behavior to simulate real combat scenarios.
+- **Score Tracking**: Keep track of your performance with an integrated scoring system.
+- **Simple and Lightweight**: No external libraries required, pure C++!
+
+## Installation
 
 For development, you will only need g++ and a ncurses package in your environment.
 
